@@ -1,0 +1,12 @@
+public static class KMeansMapper
+       extends Mapper<IntWritable, Point2DWritable, Text, IntWritable>{
+
+    public void map(IntWritable key, Point2DWritable value, Context context
+        ) throws IOException, InterruptedException {
+        double x = value.getPoint().getX();
+        double y = value.getPoint().getY();
+        if(x*x+y*y <= 1){
+            context.write(new Text("inside"), new IntWritable(1));
+        }
+    }
+  }
