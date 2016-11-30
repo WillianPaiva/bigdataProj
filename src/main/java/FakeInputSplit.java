@@ -14,8 +14,6 @@ public class FakeInputSplit extends InputSplit implements Writable{
 		// TODO Auto-generated constructor stub
 	}
 
-
-
 	public FakeInputSplit(long length) {
 		super();
 		this.length = length;

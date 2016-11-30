@@ -1,58 +1,53 @@
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.io.IntWritable;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Math;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.DoubleWritable;
-
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.io.Text;
 
 public class KMeansMapper
-    extends Mapper<Point2DWritable, Point2DWritable,Point2DWritable , Point2DWritable>
+    extends Mapper<Text, Text, DoubleWritable , DoubleWritable>
 {
-
-    private List<Point2DWritable> listPoint;
+    private List<DoubleWritable> listPoint;
     
     public void setup(Context context)
     {
-	listPoint = new ArrayList<Point2DWritable>();
+	listPoint = new ArrayList<DoubleWritable>();
 	int k = Integer.parseInt(context.getConfiguration().get("k"));
 	for(int i=0;i<k;i++)
 	    {
-		listPoint.add(new Point2DWritable(context.getConfiguration().get("k"+i)));
+                DoubleWritable kw = new DoubleWritable(Double.parseDouble(context.getConfiguration().get("k"+i)));
+		listPoint.add(kw);
 	    }
     }
 
 
-    public Point2Dwritable isCloserFrom(Point2DWritable value)
+    public DoubleWritable isCloserFrom(DoubleWritable value)
     {
-	Point2DWritable result = listPoint.get(0);
+	DoubleWritable result = listPoint.get(0);
 	double distance = Double.MAX_VALUE;
-	for(Point2DWritable point : listPoint)
+	for(DoubleWritable point : listPoint)
 	    {
-		double a = point.getX() - value.getX();
-		double b = point.getY() - value.getY();
-		double tmp = Math.sqrt(a*a + b*b);
+		double a = point.get() - value.get();
+		double tmp = Math.abs(a);
 		if(tmp < distance)
 		    {
 			distance = tmp;
 			result = point;
 		    }
 	    }
-
-	
 	return result;
     }
     
-    public void map(IntWritable key, Point2DWritable value, Context context
+    @Override
+    public void map(Text key, Text value, Context context
 		    ) throws IOException, InterruptedException {	
-	context.write( isCloserFrom(value), value);
-        
+        int columns = Integer.parseInt(context.getConfiguration().get("columns"));
+        String svalue = value.toString().split(",")[columns];
+        if(!svalue.isEmpty())
+        {
+            DoubleWritable kw = new DoubleWritable(Double.parseDouble(svalue));
+            context.write(isCloserFrom(kw), kw);
+        }
     }
 }
