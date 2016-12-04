@@ -1,13 +1,15 @@
-import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
+
 import org.apache.hadoop.io.DoubleWritable;
-
-
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.log4j.Logger;
 
 public class KMeansReducer
-    extends Reducer<DoubleWritable,DoubleWritable,DoubleWritable,DoubleWritable> {
-    public void reduce(Text key, Iterable<DoubleWritable> values,
+    extends Reducer<DoubleWritable,DoubleWritable,DoubleWritable,Text> {
+  private static Logger logger = Logger.getLogger(KMeansReducer.class);
+
+    public void reduce(DoubleWritable key, Iterable<DoubleWritable> values,
                        Context context
                        ) throws IOException, InterruptedException {
         int k = Integer.parseInt(context.getConfiguration().get("k"));
@@ -17,8 +19,10 @@ public class KMeansReducer
             avg += value.get();
             length++;
         }
-        
-        avg /= length;
-        context.write(new DoubleWritable(avg), new DoubleWritable());
+
+
+        double res = avg / length;
+        logger.info("======res---->"+res);
+        context.write(new DoubleWritable(res), new Text(""));
     }
 }
