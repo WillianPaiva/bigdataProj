@@ -15,6 +15,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.log4j.Logger;
 
+import static java.lang.System.exit;
+
 /**
  * ARGS: 0: output file, 1: input file, 2: k-means, 3: columns, 4: separator between values
  * @author alaguitard
@@ -27,6 +29,11 @@ public class Main {
 	public static List<Double> mCenters = new ArrayList<Double>();
 
     public static void main(String[] args) throws Exception {
+      if(args.length < 5)
+      {
+        System.err.println("Illegal number of argument");
+        exit(0);
+      }
       Configuration conf = new Configuration();
       FileSystem fs = FileSystem.get(conf);
 
@@ -153,12 +160,13 @@ public class Main {
       String line = br.readLine();
       while(line != null && count < k){
         String value = line.split(",")[col];
-        if(!value.isEmpty() && isDouble(value)){
-          conf.unset("k"+count);
-          conf.set("k"+count,value);
-          count++;
-          logger.info("value ---->>>"+value);
-        }
+        if (!value.isEmpty())
+          if (isDouble(value)) {
+            conf.unset("k" + count);
+            conf.set("k" + count, value);
+            count++;
+            logger.info("value ---->>>" + value);
+          }
         line = br.readLine();
       }
       br.close();
