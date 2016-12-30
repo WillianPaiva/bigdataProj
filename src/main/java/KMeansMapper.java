@@ -10,12 +10,12 @@ import org.apache.log4j.Logger;
 public class KMeansMapper
     extends Mapper<Object, Text, DoubleWritable , DoubleWritable>
 {
-  private static Logger logger = Logger.getLogger(KMeansReducer.class);
+  private static Logger logger = Logger.getLogger(KMeansMapper.class);
   private List<DoubleWritable> listPoint;
 
-  @Override
   public void setup(Context context)
   {
+    logger.info("BEGIN SETUP MAPPER");
     listPoint = new ArrayList<DoubleWritable>();
     int k = Integer.parseInt(context.getConfiguration().get("k"));
     for(int i=0;i<k;i++)
@@ -57,6 +57,7 @@ public class KMeansMapper
   @Override
   public void map(Object key, Text value, Context context
                   ) throws IOException, InterruptedException {
+    logger.info("BEGIN MAPPER");
     int columns = Integer.parseInt(context.getConfiguration().get("column"));
     String svalue = value.toString().split(",")[columns];
     if(!svalue.isEmpty() && isDouble(svalue))

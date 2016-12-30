@@ -12,6 +12,7 @@ public class KMeansReducer
     public void reduce(DoubleWritable key, Iterable<DoubleWritable> values,
                        Context context
                        ) throws IOException, InterruptedException {
+        logger.info("BEGIN REDUCER");
         int k = Integer.parseInt(context.getConfiguration().get("k"));
         double avg=0;
         double length=0;

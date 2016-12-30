@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
@@ -24,6 +25,8 @@ import static java.lang.System.exit;
 
 public class Main {
   private static Logger logger = Logger.getLogger(Main.class);
+
+  private static double MARGIN_OF_ERROR = 1;
 	public static String KVALUES = "/values.txt";
 	public static String JOB_NAME = "KMeans";
 	public static String SPLITTER = "\t| ";
@@ -64,11 +67,18 @@ public class Main {
 
       //print the array list to chck the result
       int colunmres = 1;
+      if(fs.exists(new Path(args[1]))){
+          /*If exist delete the  tmp output path*/
+          fs.delete(new Path(args[1]),true);
+        }
+      FSDataOutputStream out = fs.create(new Path(args[1]));
+      out.writeChars("Column,k,d\n");
       for(ArrayList<Double> l:res){
         int kl = 1;
         for(Double d:l){
           logger.info("=========== colunm "+colunmres+" ============= k "+kl+" = "+d);
           kl++;
+          out.writeChars(""+colunmres+","+kl+","+d+"\n");
         }
         colunmres++;
       }
@@ -136,7 +146,8 @@ public class Main {
           {
             double a = Double.parseDouble(conf.get("k"+i));
             double b = centers.get(i);
-            if(a != b){
+            logger.info("========== "+a+" - "+b+" : MARGIN "+MARGIN_OF_ERROR+"==============");
+            if(Math.abs(a - b) >= MARGIN_OF_ERROR){
               finished = false;
             }
           }
@@ -171,6 +182,7 @@ public class Main {
               BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(pt)));
               String line;
               line=br.readLine();
+
               while (line != null){
                 result.add(Double.parseDouble(line));
                 line=br.readLine();
