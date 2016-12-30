@@ -1,1 +1,9 @@
 /target/
+k-means.iml
+.project
+pom.xml
+Supprimerait .idea/.name
+Supprimerait .idea/misc.xml
+Supprimerait .idea/modules.xml
+Supprimerait .idea/vcs.xml
+Supprimerait .idea/workspace.xml
