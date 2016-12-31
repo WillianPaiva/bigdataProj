@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 import static java.lang.System.exit;
 
 /**
- * ARGS: 0: input file, 1: output file, 2: k-means, 3: n-colunms
+ * AR GS: 0: input file, 1: output file, 2: k-means, 3: n-level  n-level ,4: n-colunms
  */
 
 public class Main {
@@ -34,7 +34,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
       ArrayList<ArrayList<Double>> res = new ArrayList<ArrayList<Double>>();
-      if(args.length < 4)
+      if(args.length < 5)
       {
         System.err.println("Illegal number of argument");
         exit(0);
@@ -54,7 +54,7 @@ public class Main {
       conf.set("k",args[2]);
 
       // makes a k means for each colunm passed on the argument 
-      for(int i = 3; i<args.length ; i++){
+      for(int i = 4; i<args.length ; i++){
         res.add(calculate(args,conf,args[i],fs));
         //redelete the tmp folder to avoid error in case of a new calculation
         if(fs.exists(new Path(KVALUES))){
@@ -107,21 +107,8 @@ public class Main {
           // first iteration needs to create the base file //
           ///////////////////////////////////////////////////
           Path input = new Path(args[0]);
-          getValues(conf, input, Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-          Job job = Job.getInstance(conf, "Main");
-          job.setNumReduceTasks(1);
-          job.setJarByClass(Main.class);
-          job.setMapperClass(KMeansMapper.class);
-          job.setMapOutputKeyClass(DoubleWritable.class);
-          job.setMapOutputValueClass(DoubleWritable.class);
-          job.setReducerClass(KMeansReducer.class);
-          job.setOutputKeyClass(DoubleWritable.class);
-          job.setOutputValueClass(DoubleWritable.class);
-          job.setOutputFormatClass(TextOutputFormat.class);
-          job.setInputFormatClass(TextInputFormat.class);
-          FileInputFormat.addInputPath(job, new Path(args[0]));
-          FileOutputFormat.setOutputPath(job, new Path(KVALUES));
-          job.waitForCompletion(true);
+          getValues(conf, input, Integer.parseInt(args[2]), Integer.parseInt(colunm));
+          runJob(args[0], KVALUES,KMeansMapper.class, KMeansReducer.class,conf);
           iter++;
         }else{
           /////////////////////////////
@@ -158,20 +145,7 @@ public class Main {
               /*If exist delete the output path*/
               fs.delete(new Path(KVALUES),true);
             }
-            Job job = Job.getInstance(conf, "Main");
-            job.setNumReduceTasks(1);
-            job.setJarByClass(Main.class);
-            job.setMapperClass(KMeansMapper.class);
-            job.setMapOutputKeyClass(DoubleWritable.class);
-            job.setMapOutputValueClass(DoubleWritable.class);
-            job.setReducerClass(KMeansReducer.class);
-            job.setOutputKeyClass(DoubleWritable.class);
-            job.setOutputValueClass(DoubleWritable.class);
-            job.setOutputFormatClass(TextOutputFormat.class);
-            job.setInputFormatClass(TextInputFormat.class);
-            FileInputFormat.addInputPath(job, new Path(args[0]));
-            FileOutputFormat.setOutputPath(job, new Path(KVALUES));
-            job.waitForCompletion(true);
+            runJob(args[0], KVALUES,KMeansMapper.class, KMeansReducer.class,conf);
             iter++;
 
           }else{
@@ -232,6 +206,23 @@ public class Main {
     catch (NumberFormatException ex) {
       return false;
     }
+  }
+
+  public static void runJob(String in, String out, Class mapper, Class reducer, Configuration conf) throws IOException, ClassNotFoundException, InterruptedException{
+    Job job = Job.getInstance(conf, "Main");
+    job.setNumReduceTasks(1);
+    job.setJarByClass(Main.class);
+    job.setMapperClass(mapper);
+    job.setMapOutputKeyClass(DoubleWritable.class);
+    job.setMapOutputValueClass(DoubleWritable.class);
+    job.setReducerClass(reducer);
+    job.setOutputKeyClass(DoubleWritable.class);
+    job.setOutputValueClass(DoubleWritable.class);
+    job.setOutputFormatClass(TextOutputFormat.class);
+    job.setInputFormatClass(TextInputFormat.class);
+    FileInputFormat.addInputPath(job, new Path(in));
+    FileOutputFormat.setOutputPath(job, new Path(out));
+    job.waitForCompletion(true);
   }
 
 }
