@@ -60,7 +60,10 @@ public class KMeansMapper
     logger.info("BEGIN MAPPER");
     int columns = Integer.parseInt(context.getConfiguration().get("column"));
     String svalue = value.toString().split(",")[columns];
-    if(!svalue.isEmpty() && isDouble(svalue))
+    if(svalue.isEmpty()){
+      svalue = "0";
+    }
+    if(isDouble(svalue))
     {
       DoubleWritable kw = new DoubleWritable(Double.parseDouble(svalue));
       context.write(isCloserFrom(kw), kw);
