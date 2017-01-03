@@ -9,11 +9,13 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -73,14 +75,16 @@ public class Main {
 
     //delete the output file if it exists
     deleteFile(args[1], fs);
-    OutputStream out = fs.create(new Path(TEMPIN+"/N"+(N+1)+"/0"));
-    PrintStream printStream = new PrintStream(out);
-    String line="";
-    printStream.println(line);
-    printStream.close();
-    fs.concat(new Path(TEMPIN+"/N"+(N+1)+"/0"), pths);
-    copyFile(TEMPIN+"/N"+(N+1)+"/0",args[1],fs, conf);
 
+    Path outPut = new Path(args[1]);
+    OutputStream os = fs.create(outPut);
+    for(Path path:pths){
+      FSDataInputStream is = fs.open(path);
+      //copy the intout in to the output using the conf format
+      IOUtils.copyBytes(is,os,conf,false);
+      is.close();
+    }
+    os.close();
   }
 
   public static boolean kmeans(int level,
@@ -122,17 +126,18 @@ public class Main {
       for(int i = 0; i < K; i++){
         String line="";
         for(ArrayList<Double> d:centroids){
-
-          if(line.equals("")){
-            line = d.get(i).toString();
-          }else{
-            line = line+","+d.get(i).toString();
+          if(i < d.size()){
+            if(line.equals("")){
+              line = d.get(i).toString();
+            }else{
+              line = line+","+d.get(i).toString();
+            }
           }
         }
         printStream.println(line);
       }
       printStream.close();
-
+      out.close();
       runJobBuild(path,
                   TEMPOUT+"/N"+level+"/clusters"+path.getName(),
                   KPartMapper.class,
