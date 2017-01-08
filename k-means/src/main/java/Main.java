@@ -20,6 +20,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -31,7 +32,7 @@ import org.apache.log4j.Logger;
 
 public class Main {
   private static Logger logger = Logger.getLogger(Main.class);
-  private static double MARGIN_OF_ERROR = 1;
+  private static double MARGIN_OF_ERROR = 0.1;
   public static String KVALUES = "/values.txt";
   public static String TEMPIN = "/tempIn";
   public static String TEMPOUT = "/tempOut";
@@ -58,9 +59,9 @@ public class Main {
 
     //delete the tmp file
     deleteFile(KVALUES, fs);
-
     deleteFile(TEMPIN, fs);
     deleteFile(TEMPOUT, fs);
+
     //copy the input file into tempin file 
     fs.mkdirs(new Path(TEMPIN+"/N1"));
     copyFile(args[0],TEMPIN+"/N1/1",fs,conf);
@@ -374,6 +375,31 @@ public class Main {
     FileInputFormat.addInputPath(job, in);
     FileOutputFormat.setOutputPath(job, new Path(out));
     job.waitForCompletion(true);
+  }
+
+  public static void runLabelJob(Path[] in,
+                                 String out,
+                                 Class mapper,
+                                 Class reducer,
+                                 Configuration conf
+                                 )
+      throws IOException, ClassNotFoundException, InterruptedException{
+    Job job = Job.getInstance(conf, "Main");
+    job.setNumReduceTasks(1);
+    job.setJarByClass(Main.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(Text.class);
+    job.setReducerClass(reducer);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(Text.class);
+    job.setOutputFormatClass(TextOutputFormat.class);
+    for(Path p:in){
+      MultipleInputs.addInputPath(job, p,
+                                  TextInputFormat.class, mapper);
+    }
+    FileOutputFormat.setOutputPath(job, new Path(out));
+    job.waitForCompletion(true);
+
   }
 }
 
