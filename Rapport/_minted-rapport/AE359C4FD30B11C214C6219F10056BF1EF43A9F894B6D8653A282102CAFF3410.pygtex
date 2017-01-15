@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{Path} \PYG{n}{outPut} \PYG{o}{=} \PYG{k}{new} \PYG{n}{Path}\PYG{o}{(}\PYG{n}{args}\PYG{o}{[}\PYG{l+m+mi}{1}\PYG{o}{]);}
+\PYG{n}{OutputStream} \PYG{n}{os} \PYG{o}{=} \PYG{n}{fs}\PYG{o}{.}\PYG{n+na}{create}\PYG{o}{(}\PYG{n}{outPut}\PYG{o}{);}
+\PYG{k}{for}\PYG{o}{(}\PYG{n}{Path} \PYG{n}{path}\PYG{o}{:}\PYG{n}{pths}\PYG{o}{)\PYGZob{}}
+  \PYG{n}{FSDataInputStream} \PYG{n}{is} \PYG{o}{=} \PYG{n}{fs}\PYG{o}{.}\PYG{n+na}{open}\PYG{o}{(}\PYG{n}{path}\PYG{o}{);}
+  \PYG{c+c1}{//copy the intout in to the output using the conf format}
+  \PYG{n}{IOUtils}\PYG{o}{.}\PYG{n+na}{copyBytes}\PYG{o}{(}\PYG{n}{is}\PYG{o}{,}\PYG{n}{os}\PYG{o}{,}\PYG{n}{conf}\PYG{o}{,}\PYG{k+kc}{false}\PYG{o}{);}
+  \PYG{n}{is}\PYG{o}{.}\PYG{n+na}{close}\PYG{o}{();}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}

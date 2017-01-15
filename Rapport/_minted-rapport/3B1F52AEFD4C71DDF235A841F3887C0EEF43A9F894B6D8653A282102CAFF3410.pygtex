@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{fs}\PYG{o}{.}\PYG{n+na}{mkdirs}\PYG{o}{(}\PYG{k}{new} \PYG{n}{Path}\PYG{o}{(}\PYG{n}{TEMPIN}\PYG{o}{+}\PYG{l+s}{\PYGZdq{}/N1\PYGZdq{}}\PYG{o}{));}
+\end{Verbatim}

@@ -377,30 +377,6 @@ public class Main {
     job.waitForCompletion(true);
   }
 
-  public static void runLabelJob(Path[] in,
-                                 String out,
-                                 Class mapper,
-                                 Class reducer,
-                                 Configuration conf
-                                 )
-      throws IOException, ClassNotFoundException, InterruptedException{
-    Job job = Job.getInstance(conf, "Main");
-    job.setNumReduceTasks(1);
-    job.setJarByClass(Main.class);
-    job.setMapOutputKeyClass(IntWritable.class);
-    job.setMapOutputValueClass(Text.class);
-    job.setReducerClass(reducer);
-    job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(Text.class);
-    job.setOutputFormatClass(TextOutputFormat.class);
-    for(Path p:in){
-      MultipleInputs.addInputPath(job, p,
-                                  TextInputFormat.class, mapper);
-    }
-    FileOutputFormat.setOutputPath(job, new Path(out));
-    job.waitForCompletion(true);
-
-  }
 }
 
 

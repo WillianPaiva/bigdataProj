@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{public} \PYG{k+kt}{void} \PYG{n+nf}{map}\PYG{o}{(}\PYG{n}{Object} \PYG{n}{key}\PYG{o}{,} \PYG{n}{Text} \PYG{n}{value}\PYG{o}{,} \PYG{n}{Context} \PYG{n}{context}
+                \PYG{o}{)} \PYG{k+kd}{throws} \PYG{n}{IOException}\PYG{o}{,} \PYG{n}{InterruptedException} \PYG{o}{\PYGZob{}}
+  \PYG{n}{String}\PYG{o}{[]} \PYG{n}{values} \PYG{o}{=} \PYG{n}{value}\PYG{o}{.}\PYG{n+na}{toString}\PYG{o}{().}\PYG{n+na}{split}\PYG{o}{(}\PYG{l+s}{\PYGZdq{},\PYGZdq{}}\PYG{o}{);}
+  \PYG{n}{String} \PYG{n}{sk} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{o}{;}
+  \PYG{k}{for}\PYG{o}{(}\PYG{k+kt}{int} \PYG{n}{x}\PYG{o}{:}\PYG{n}{labels}\PYG{o}{)\PYGZob{}}
+    \PYG{k+kt}{int} \PYG{n}{l} \PYG{o}{=} \PYG{n}{Integer}\PYG{o}{.}\PYG{n+na}{parseInt}\PYG{o}{(}\PYG{n}{values}\PYG{o}{[}\PYG{n}{x}\PYG{o}{].}\PYG{n+na}{replaceAll}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}\PYGZbs{}\PYGZbs{}s+\PYGZdq{}}\PYG{o}{,}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{o}{));}
+    \PYG{k}{if}\PYG{o}{(}\PYG{n}{sk}\PYG{o}{.}\PYG{n+na}{equals}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{o}{))\PYGZob{}}
+      \PYG{n}{sk} \PYG{o}{+=} \PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{o}{+}\PYG{n}{l}\PYG{o}{;}
+    \PYG{o}{\PYGZcb{}}\PYG{k}{else}\PYG{o}{\PYGZob{}}
+      \PYG{n}{sk} \PYG{o}{+=} \PYG{l+s}{\PYGZdq{},\PYGZdq{}}\PYG{o}{+}\PYG{n}{l}\PYG{o}{;}
+    \PYG{o}{\PYGZcb{}}
+    \PYG{k}{if}\PYG{o}{(}\PYG{n}{values}\PYG{o}{[}\PYG{n}{measureCol}\PYG{o}{].}\PYG{n+na}{equals}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{o}{))\PYGZob{}}
+      \PYG{n}{values}\PYG{o}{[}\PYG{n}{measureCol}\PYG{o}{]} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}0\PYGZdq{}}\PYG{o}{;}
+    \PYG{o}{\PYGZcb{}}
+    \PYG{n}{context}\PYG{o}{.}\PYG{n+na}{write}\PYG{o}{(}\PYG{k}{new} \PYG{n}{LabelKey}\PYG{o}{(}\PYG{k}{new} \PYG{n}{Text}\PYG{o}{(}\PYG{n}{sk}\PYG{o}{)),}\PYG{k}{new} \PYG{n}{Text}\PYG{o}{(}\PYG{n}{values}\PYG{o}{[}\PYG{n}{labelCol}\PYG{o}{]+}\PYG{l+s}{\PYGZdq{},\PYGZdq{}}\PYG{o}{+}\PYG{n}{values}\PYG{o}{[}\PYG{n}{measureCol}\PYG{o}{]));}
+  \PYG{o}{\PYGZcb{}}
+
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}
