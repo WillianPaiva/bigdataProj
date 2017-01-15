@@ -36,7 +36,7 @@
 \section{Introduction}
 \label{sec:org2c21b8d}
 
-Ce projet est destiné à mettre en oeuvre un programme en map/reduce pattern pour calculer le K-means
+Ce projet est destiné à mettre en œuvre un programme en map/reduce pattern pour calculer le K-means
 d'un ensemble de données à N dimensions en utilisant la récursivité pour construire un arbre hiérarchique.
 Il a aussi pour objectif de réaliser un deuxième programme  map/reduce pattern qui étiquette les clusters
 créés à chaque niveau de la hiérarchie. 
@@ -51,30 +51,30 @@ créés à chaque niveau de la hiérarchie.
 Le programme K-means travaille en exécutant les étapes suivantes :
 
 \begin{enumerate}
-\item création d'un dossier temporaire d'input dans les hdfs
-\item copie du fichier input dans le premier niveau du dossier temporaire d'input
-\item création d'un dossier temporaire d'output dans les hdfs
-\item lancement d'un job pour tous les fichiers de chaque dossier d'un même niveau du dossier temporaire d'input en cours de traitement    
+\item Création d'un dossier temporaire d'input dans les hdfs
+\item Copie du fichier input dans le premier niveau du dossier temporaire d'input
+\item Création d'un dossier temporaire d'output dans les hdfs
+\item Lancement d'un job pour tous les fichiers de chaque dossier d'un même niveau du dossier temporaire d'input en cours de traitement. Ce job fait deux choses:  
 \begin{enumerate}
-\item examine chaque fichier pour trouver le K-means
-\item une fois qu'il est trouvé, création d'un fichier pour chaque cluster, doté de son numéro de cluster mis à la fin de chaque ligne et transfert dans le dossier temporaire d'outputs
+\item Il examine chaque fichier pour trouver le K-means
+\item Une fois qu'il est trouvé, création d'un fichier pour chaque cluster, doté de son numéro de cluster mis à la fin de chaque ligne et transfert dans le dossier temporaire d'outputs
 \end{enumerate}
-\item prise de l'output des K-means et copie dans le niveau suivant du dossier temporaire d'input
-\item une fois les K-means finis, concaténation des fichiers au dernier niveau du dossier temporaire d'input, et versement dans le fichier
+\item Prise de l'output des K-means et copie dans le niveau suivant du dossier temporaire d'input
+\item Une fois les K-means finis, concaténation des fichiers au dernier niveau du dossier temporaire d'input, et versement dans le fichier
 d'output défini dans les paramètres.
 \end{enumerate}
 
 
-\subsubsection{étapes 1 et 3}
+\subsubsection{Étapes 1 et 3}
 \label{sec:org278f684}
 
-Pour créer les dossiers, nous utilisons la méthode mkdirs de FileSystem
+Pour créer les dossiers, nous utilisons la méthode mkdirs de FileSystem:
 
 \begin{minted}[frame=lines,fontsize=\scriptsize,linenos]{java}
 fs.mkdirs(new Path(TEMPIN+"/N1"));
 \end{minted}
 
-\subsubsection{étape 2}
+\subsubsection{Étape 2}
 \label{sec:org4cebcfd}
 
 Cette étape consiste à copier le fichier d'input dans le dossier temporaire d'input, à l'intérieur du sous-dossier N1 qui représente le 
@@ -84,12 +84,12 @@ niveau 1 de l'arbre hiérarchique, et pour cela, nous utilisons le simple code :
 copyFile(args[0],TEMPIN+"/N1/1",fs,conf);
 \end{minted}
 
-  Cette partie en particulièr contenait un problème dont nous ne nous sommes pas rendu compte avant la fin du projet. Car nous avons toujours
+  Cette partie en particulier contenait un problème dont nous ne nous sommes pas rendu compte avant la fin du projet. Car nous avons toujours
 testé le programme avec le fichier \emph{worldcitiespop.txt} et ça n'avait jamais posé de problème ; mais une fois que le code a été testé avec 
 le gros fichier 52Go du cluster de machines de l'Université, nous avons constaté que cette approche n'était vraiment pas la bonne. 
 Et de ce fait, les performances de notre programme en ont souffert\ldots{} 
 
-\subsubsection{étape 4 et 5}
+\subsubsection{Étape 4 et 5}
 \label{sec:org6f965fa}
 C'est là le coeur du programme ; à cette étape, nous lançons un K-means pour chaque fichier à l'intérieur d'un dossier du niveau
 hiérarchique de l'arbre. Exemple : 
@@ -129,10 +129,10 @@ Le K-means va copier l'output dans un fichier pour chaque cluster au niveau suiv
 /tempin/N3/4
 \end{verbatim}
 
-\item et ainsi de suite, jusqu'à atteindre le niveau donné dasn le paramètre +1
+\item et ainsi de suite, jusqu'à atteindre le niveau donné dans le paramètre +1
 \end{itemize}
 
-\subsubsection{étape 6}
+\subsubsection{Étape 6}
 \label{sec:org23c7f99}
 
 A cette étape, nous concaténons tous les fichiers du dernier niveau du dossier d'input, pour constituer un fichier 
@@ -153,29 +153,34 @@ for(Path path:pths){
 \subsection{Etiquettage}
 \label{sec:org96d6485}
 
-La partie "étiquettage" du projet a été réalisée en développant une classe appelée \emph{LabelKey/qui est /writable} 
-et \emph{comparable} et aussi en développant un \emph{partitioner} qui sépar les clés par le numéro de niveau de l'arbre.
+La partie "étiquettage" du projet a été réalisée en développant une classe appelée \emph{LabelKey} qui est \emph{writable} 
+et \emph{comparable} et aussi en développant un \emph{partitioner} qui sépare les clés par le numéro de niveau de l'arbre.
 Le \emph{LabelKey} prend simplement les colonnes de clusters et crée une chaîne en tant que clé. Exemple : 
 
 \begin{verbatim}
 text,0,1,2 --> key = "0,1,2"
 \end{verbatim}
 
-Dans ce cas, il créerait une taille qui représente le niveau ; dans cet exemplen la clé serait de taille 3.
+Dans ce cas, il créerait une taille qui représente le niveau ; dans cet exemple la clé serait de taille 3.
 
 \subsubsection{Le \emph{mapper}}
 \label{sec:org90eeb28}
 
 le \emph{mapper} dans ce programme lit les lignes et pour chaque ligne, écrit dans le \emph{context} la 
 [key, label, value] mais il fait ceci depuis le premier jusqu'au dernier niveau. 
-
+\newpage
 \begin{minted}[frame=lines,fontsize=\scriptsize,linenos]{java}
 public void map(Object key, Text value, Context context
                 ) throws IOException, InterruptedException {
   String[] values = value.toString().split(",");
   String sk = "";
   for(int x:labels){
-    int l = Integer.parseInt(values[x].replaceAll("\\s+",""));
+  int l=0;
+  try{
+    l = Integer.parseInt(values[x].replaceAll("\\s+",""));
+    }
+    catch(NumbeFormatException e){ return; }
+    
     if(sk.equals("")){
       sk += ""+l;
     }else{
