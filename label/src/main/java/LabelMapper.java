@@ -1,12 +1,11 @@
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class LabelMapper 
     extends Mapper<Object, Text, LabelKey , Text>
@@ -32,7 +31,10 @@ public class LabelMapper
     String[] values = value.toString().split(",");
     String sk = "";
     for(int x:labels){
-      int l = Integer.parseInt(values[x].replaceAll("\\s+",""));
+      int l = 0;
+      try {
+        l = Integer.parseInt(values[x].replaceAll("\\s+", ""));
+      }catch(NumberFormatException e){ return; }
       if(sk.equals("")){
         sk += ""+l;
       }else{
